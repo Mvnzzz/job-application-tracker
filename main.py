@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Job Application Tracker
 A simple command-line tool to track graduate job applications.
@@ -113,6 +113,33 @@ def update_status(apps: list[dict]) -> None:
     print(f"Updated #{app_id} → {status}")
 
 
+def delete_application(apps: list[dict]) -> None:
+    if not apps:
+        print("Nothing to delete yet.")
+        return
+
+    list_applications(apps)
+    try:
+        app_id = int(input("\nID to delete: ").strip())
+    except ValueError:
+        print("Please enter a number.")
+        return
+
+    app = next((a for a in apps if a["id"] == app_id), None)
+    if not app:
+        print(f"No application with id {app_id}.")
+        return
+
+    confirm = input(f"Delete #{app_id} {app['company']} — {app['role']}? [y/N]: ").strip().lower()
+    if confirm != "y":
+        print("Cancelled.")
+        return
+
+    apps[:] = [a for a in apps if a["id"] != app_id]
+    save_apps(apps)
+    print(f"Deleted #{app_id}.")
+
+
 def show_menu() -> None:
     print(
         """
@@ -123,7 +150,8 @@ def show_menu() -> None:
 2) List all
 3) List by status
 4) Update status
-5) Quit
+5) Delete application
+6) Quit
 """
     )
 
@@ -132,7 +160,7 @@ def main() -> None:
     apps = load_apps()
     while True:
         show_menu()
-        choice = input("Choose (1-5): ").strip()
+        choice = input("Choose (1-6): ").strip()
         if choice == "1":
             add_application(apps)
             apps = load_apps()
@@ -149,10 +177,13 @@ def main() -> None:
             update_status(apps)
             apps = load_apps()
         elif choice == "5":
+            delete_application(apps)
+            apps = load_apps()
+        elif choice == "6":
             print("Bye — keep applying.")
             break
         else:
-            print("Pick a number from 1 to 5.")
+            print("Pick a number from 1 to 6.")
 
 
 if __name__ == "__main__":

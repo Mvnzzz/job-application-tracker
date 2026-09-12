@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""
+Job Application Tracker
+A simple command-line tool to track graduate job applications.
+Uses only the Python standard library (no extra installs).
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import date
+from pathlib import Path
+
+DATA_DIR = Path(__file__).parent / "data"
+DATA_FILE = DATA_DIR / "applications.json"
+
+STATUSES = ("wishlist", "applied", "interview", "offer", "rejected")
+
+
+def load_apps() -> list[dict]:
+    if not DATA_FILE.exists():
+        return []
+    with DATA_FILE.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_apps(apps: list[dict]) -> None:
+    DATA_DIR.mkdir(exist_ok=True)
+    with DATA_FILE.open("w", encoding="utf-8") as f:
+        json.dump(apps, f, indent=2)
+
+
+def next_id(apps: list[dict]) -> int:
+    if not apps:
+        return 1
+    return max(app["id"] for app in apps) + 1
+
+
+def add_application(apps: list[dict]) -> None:
+    print("\n--- Add application ---")
+    company = input("Company: ").strip()
+    role = input("Role / job title: ").strip()
+    link = input("Job link (optional): ").strip()
+    notes = input("Notes (optional): ").strip()
+
+    print("Status options:", ", ".join(STATUSES))
+    status = input("Status [applied]: ").strip().lower() or "applied"
+    if status not in STATUSES:
+        print(f"Unknown status '{status}', using 'applied'.")
+        status = "applied"
+
+    app = {
+        "id": next_id(apps),
+        "company": company,
+        "role": role,
+        "status": status,
+        "date_added": date.today().isoformat(),
+        "link": link,
+        "notes": notes,
+    }
+    apps.append(app)
+    save_apps(apps)
+    print(f"Saved #{app['id']}: {company} — {role} ({status})")
+
+
+def list_applications(apps: list[dict], status_filter: str | None = None) -> None:
+    print("\n--- Applications ---")
+    rows = apps
+    if status_filter:
+        rows = [a for a in apps if a["status"] == status_filter]
+
+    if not rows:
+        print("No applications found.")
+        return
+
+    for app in rows:
+        link_bit = f" | {app['link']}" if app.get("link") else ""
+        notes_bit = f"\n    notes: {app['notes']}" if app.get("notes") else ""
+        print(
+            f"#{app['id']}  {app['company']} — {app['role']}\n"
+            f"    status: {app['status']}  |  added: {app['date_added']}{link_bit}{notes_bit}"
+        )
+
+
+def update_status(apps: list[dict]) -> None:
+    if not apps:
+        print("Nothing to update yet.")
+        return
+
+    list_applications(apps)
+    try:
+        app_id = int(input("\nID to update: ").strip())
+    except ValueError:
+        print("Please enter a number.")
+        return
+
+    app = next((a for a in apps if a["id"] == app_id), None)
+    if not app:
+        print(f"No application with id {app_id}.")
+        return
+
+    print("Status options:", ", ".join(STATUSES))
+    status = input(f"New status [{app['status']}]: ").strip().lower()
+    if not status:
+        print("No change.")
+        return
+    if status not in STATUSES:
+        print(f"Unknown status '{status}'.")
+        return
+
+    app["status"] = status
+    save_apps(apps)
+    print(f"Updated #{app_id} → {status}")
+
+
+def show_menu() -> None:
+    print(
+        """
+==============================
+  Job Application Tracker
+==============================
+1) Add application
+2) List all
+3) List by status
+4) Update status
+5) Quit
+"""
+    )
+
+
+def main() -> None:
+    apps = load_apps()
+    while True:
+        show_menu()
+        choice = input("Choose (1-5): ").strip()
+        if choice == "1":
+            add_application(apps)
+            apps = load_apps()
+        elif choice == "2":
+            list_applications(apps)
+        elif choice == "3":
+            print("Status options:", ", ".join(STATUSES))
+            status = input("Filter status: ").strip().lower()
+            if status not in STATUSES:
+                print("Unknown status.")
+            else:
+                list_applications(apps, status)
+        elif choice == "4":
+            update_status(apps)
+            apps = load_apps()
+        elif choice == "5":
+            print("Bye — keep applying.")
+            break
+        else:
+            print("Pick a number from 1 to 5.")
+
+
+if __name__ == "__main__":
+    main()

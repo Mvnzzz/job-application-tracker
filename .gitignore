@@ -1,0 +1,15 @@
+# Local data (keep your real applications private)
+data/applications.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

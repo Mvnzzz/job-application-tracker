@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "company": "Softwire",
+    "role": "Graduate Software Developer",
+    "status": "applied",
+    "date_added": "2026-09-12",
+    "link": "https://online.softwire.com/apply",
+    "notes": "Training-focused scheme, London"
+  },
+  {
+    "id": 2,
+    "company": "FDM Group",
+    "role": "Software Engineering Graduate Programme",
+    "status": "wishlist",
+    "date_added": "2026-09-12",
+    "link": "https://www.fdmgroup.com/candidates/graduate-programme/",
+    "notes": "Academy training then client placement"
+  }
+]

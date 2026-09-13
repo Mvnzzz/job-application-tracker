@@ -116,6 +116,31 @@ def update_status(apps: list[dict]) -> None:
     print(f"Updated #{app_id} → {status}")
 
 
+def edit_notes(apps: list[dict]) -> None:
+    if not apps:
+        print("Nothing to edit yet.")
+        return
+
+    list_applications(apps)
+    try:
+        app_id = int(input("\nID to edit notes: ").strip())
+    except ValueError:
+        print("Please enter a number.")
+        return
+
+    app = next((a for a in apps if a["id"] == app_id), None)
+    if not app:
+        print(f"No application with id {app_id}.")
+        return
+
+    current = app.get("notes") or ""
+    print(f"Current notes: {current if current else '(none)'}")
+    notes = input("New notes (leave blank to clear): ")
+    app["notes"] = notes.strip()
+    save_apps(apps)
+    print(f"Updated notes for #{app_id}.")
+
+
 def delete_application(apps: list[dict]) -> None:
     if not apps:
         print("Nothing to delete yet.")
@@ -191,7 +216,8 @@ def show_menu() -> None:
 5) Delete application
 6) Status summary
 7) Export to CSV
-8) Quit
+8) Edit notes
+9) Quit
 """
     )
 
@@ -200,7 +226,7 @@ def main() -> None:
     apps = load_apps()
     while True:
         show_menu()
-        choice = input("Choose (1-8): ").strip()
+        choice = input("Choose (1-9): ").strip()
         if choice == "1":
             add_application(apps)
             apps = load_apps()
@@ -224,10 +250,13 @@ def main() -> None:
         elif choice == "7":
             export_csv(apps)
         elif choice == "8":
+            edit_notes(apps)
+            apps = load_apps()
+        elif choice == "9":
             print("Bye - keep applying.")
             break
         else:
-            print("Pick a number from 1 to 8.")
+            print("Pick a number from 1 to 9.")
 
 
 if __name__ == "__main__":

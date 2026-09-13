@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Job Application Tracker
 A simple command-line tool to track graduate job applications.
@@ -7,14 +7,17 @@ Uses only the Python standard library (no extra installs).
 
 from __future__ import annotations
 
+import csv
 import json
 from datetime import date
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_FILE = DATA_DIR / "applications.json"
+EXPORT_FILE = DATA_DIR / "applications_export.csv"
 
 STATUSES = ("wishlist", "applied", "interview", "offer", "rejected")
+CSV_FIELDS = ("id", "company", "role", "status", "date_added", "link", "notes")
 
 
 def load_apps() -> list[dict]:
@@ -140,7 +143,6 @@ def delete_application(apps: list[dict]) -> None:
     print(f"Deleted #{app_id}.")
 
 
-
 def status_summary(apps: list[dict]) -> None:
     print("\n--- Status summary ---")
     if not apps:
@@ -165,6 +167,17 @@ def status_summary(apps: list[dict]) -> None:
     print(f"  total: {total}")
 
 
+def export_csv(apps: list[dict]) -> None:
+    print("\n--- Export to CSV ---")
+    DATA_DIR.mkdir(exist_ok=True)
+    with EXPORT_FILE.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for app in apps:
+            writer.writerow({field: app.get(field, "") for field in CSV_FIELDS})
+    print(f"Exported {len(apps)} application(s) to {EXPORT_FILE}")
+
+
 def show_menu() -> None:
     print(
         """
@@ -177,7 +190,8 @@ def show_menu() -> None:
 4) Update status
 5) Delete application
 6) Status summary
-7) Quit
+7) Export to CSV
+8) Quit
 """
     )
 
@@ -186,7 +200,7 @@ def main() -> None:
     apps = load_apps()
     while True:
         show_menu()
-        choice = input("Choose (1-7): ").strip()
+        choice = input("Choose (1-8): ").strip()
         if choice == "1":
             add_application(apps)
             apps = load_apps()
@@ -208,10 +222,12 @@ def main() -> None:
         elif choice == "6":
             status_summary(apps)
         elif choice == "7":
+            export_csv(apps)
+        elif choice == "8":
             print("Bye - keep applying.")
             break
         else:
-            print("Pick a number from 1 to 7.")
+            print("Pick a number from 1 to 8.")
 
 
 if __name__ == "__main__":

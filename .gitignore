@@ -1,5 +1,6 @@
 # Local data (keep your real applications private)
 data/applications.json
+data/applications_export.csv
 
 # Python
 __pycache__/

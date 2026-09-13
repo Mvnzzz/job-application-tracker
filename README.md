@@ -1,4 +1,4 @@
-﻿# Job Application Tracker
+# Job Application Tracker
 
 A simple command-line tool to track graduate job applications. Built with **Python 3** and the standard library only (no pip packages).
 
@@ -14,6 +14,7 @@ I built this while applying for computer science graduate / IT roles in the UK. 
 - Update an application's status
 - Delete an application
 - Status summary counts (wishlist / applied / interview / offer / rejected)
+- Export all applications to CSV (`data/applications_export.csv`)
 - Data saved in `data/applications.json`
 
 ## Requirements
@@ -35,7 +36,7 @@ python3 main.py
 ## Example
 
 ```
-Choose (1-7): 1
+Choose (1-8): 1
 Company: Softwire
 Role / job title: Graduate Software Developer
 Job link (optional): https://online.softwire.com/apply
@@ -43,20 +44,23 @@ Notes (optional): Training-focused, London
 Status [applied]: applied
 ```
 
+Export everything with menu option **7) Export to CSV** — writes `data/applications_export.csv` with columns: id, company, role, status, date_added, link, notes.
+
 ## Project structure
 
 ```
 job-application-tracker/
 ├── main.py
 ├── data/
-│   └── applications.json   (created when you add your first application)
+│   ├── applications.json         (created when you add your first application)
+│   └── applications_export.csv   (created when you export)
 ├── .gitignore
 └── README.md
 ```
 
 ## What I practised
 
-- Python fundamentals (functions, files, JSON, menus)
+- Python fundamentals (functions, files, JSON, CSV, menus)
 - Git commits and pushing a project to GitHub
 - Writing a clear README for employers
 

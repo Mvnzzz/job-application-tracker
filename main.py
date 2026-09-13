@@ -140,6 +140,31 @@ def delete_application(apps: list[dict]) -> None:
     print(f"Deleted #{app_id}.")
 
 
+
+def status_summary(apps: list[dict]) -> None:
+    print("\n--- Status summary ---")
+    if not apps:
+        print("No applications yet.")
+        return
+
+    counts = {status: 0 for status in STATUSES}
+    for app in apps:
+        status = app.get("status")
+        if status in counts:
+            counts[status] += 1
+        else:
+            counts.setdefault(status, 0)
+            counts[status] += 1
+
+    total = len(apps)
+    for status in STATUSES:
+        print(f"  {status}: {counts[status]}")
+    extra = {k: v for k, v in counts.items() if k not in STATUSES}
+    for status, n in sorted(extra.items()):
+        print(f"  {status}: {n}")
+    print(f"  total: {total}")
+
+
 def show_menu() -> None:
     print(
         """
@@ -151,7 +176,8 @@ def show_menu() -> None:
 3) List by status
 4) Update status
 5) Delete application
-6) Quit
+6) Status summary
+7) Quit
 """
     )
 
@@ -160,7 +186,7 @@ def main() -> None:
     apps = load_apps()
     while True:
         show_menu()
-        choice = input("Choose (1-6): ").strip()
+        choice = input("Choose (1-7): ").strip()
         if choice == "1":
             add_application(apps)
             apps = load_apps()
@@ -180,10 +206,12 @@ def main() -> None:
             delete_application(apps)
             apps = load_apps()
         elif choice == "6":
-            print("Bye — keep applying.")
+            status_summary(apps)
+        elif choice == "7":
+            print("Bye - keep applying.")
             break
         else:
-            print("Pick a number from 1 to 6.")
+            print("Pick a number from 1 to 7.")
 
 
 if __name__ == "__main__":

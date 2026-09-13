@@ -13,6 +13,7 @@ I built this while applying for computer science graduate / IT roles in the UK. 
 - Filter by status (`wishlist`, `applied`, `interview`, `offer`, `rejected`)
 - Update an application's status
 - Delete an application
+- Status summary counts (wishlist / applied / interview / offer / rejected)
 - Data saved in `data/applications.json`
 
 ## Requirements
@@ -34,7 +35,7 @@ python3 main.py
 ## Example
 
 ```
-Choose (1-6): 1
+Choose (1-7): 1
 Company: Softwire
 Role / job title: Graduate Software Developer
 Job link (optional): https://online.softwire.com/apply
